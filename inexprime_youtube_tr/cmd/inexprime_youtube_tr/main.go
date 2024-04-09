@@ -34,7 +34,7 @@ func parseVideoDetails(videoDetails string) (string, string, error) {
 func main() {
 	//TODO: has to go somewhere into by UI useable file
 	videoID := "0hBQBhinxeU"
-	//TODO: has to be hid somewhere in secrets
+	//TODO: has to be hidden somewhere in secrets
 	apiKey := "AIzaSyCtebTX6Qn1m1DL6ZpsRBv-czqBW7PkpCk"
 
 	videoDetails, err := youtube.FetchVideoDetails(videoID, apiKey)

@@ -4,6 +4,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+    "os"
+    "log"
 	"youtube_tracker/pkg/youtube"
 )
 
@@ -32,10 +34,14 @@ func parseVideoDetails(videoDetails string) (string, string, error) {
 }
 
 func main() {
-	//TODO: has to go somewhere into by UI useable file
-	videoID := "0hBQBhinxeU"
-	//TODO: has to be hidden somewhere in secrets
-	apiKey := "AIzaSyCtebTX6Qn1m1DL6ZpsRBv-czqBW7PkpCk"
+
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file. Err: %s", err)
+	}
+	// TODO put inside secrets or somewhere there
+	videoID := os.Getenv("VIDEO_ID")
+	apiKey := os.Getenv("API_KEY")
 
 	videoDetails, err := youtube.FetchVideoDetails(videoID, apiKey)
 	if err != nil {

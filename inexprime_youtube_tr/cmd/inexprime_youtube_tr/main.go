@@ -4,8 +4,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-    "os"
-    "log"
+	"github.com/joho/godotenv"
+	"log"
+	"os"
 	"youtube_tracker/pkg/youtube"
 )
 
@@ -27,6 +28,10 @@ func parseVideoDetails(videoDetails string) (string, string, error) {
 		return "", "", err
 	}
 
+	if len(video.Items) == 0 {
+		return "", "", fmt.Errorf("no items in video")
+	}
+
 	title := video.Items[0].Snippet.Title
 	description := video.Items[0].Snippet.Description
 
@@ -35,12 +40,12 @@ func parseVideoDetails(videoDetails string) (string, string, error) {
 
 func main() {
 
-	err := godotenv.Load(".env")
+	err := godotenv.Load("../../.env")
 	if err != nil {
 		log.Fatalf("Error loading .env file. Err: %s", err)
 	}
 	// TODO put inside secrets or somewhere there
-	videoID := os.Getenv("VIDEO_ID")
+	videoID := "0hBQBhinxeU"
 	apiKey := os.Getenv("API_KEY")
 
 	videoDetails, err := youtube.FetchVideoDetails(videoID, apiKey)

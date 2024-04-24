@@ -5,7 +5,7 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
-	"github.com/Droshow/inexprime.youtube/inexprime_youtube_tr/pkg/calendar/gmail/configuration"
+	"youtube_tracker/pkg/calendar/gmail/configuration"
 )
 
 type GmailService struct {
@@ -19,4 +19,12 @@ func NewGmailService(ctx context.Context, token *oauth2.Token) (*GmailService, e
 		return nil, err
 	}
 	return &GmailService{Service: service}, nil
+}
+
+func (s *GmailService) CreateEvent(ctx context.Context, event *calendar.Event) (*calendar.Event, error) {
+	newEvent, err := s.Service.Events.Insert("primary", event).Do()
+	if err != nil {
+		return nil, err
+	}
+	return newEvent, nil
 }

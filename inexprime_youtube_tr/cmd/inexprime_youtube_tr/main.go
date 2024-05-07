@@ -1,71 +1,41 @@
-// File: cmd/inexprime_youtube_tr/main.go
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/joho/godotenv"
-	"log"
-	"os"
-	"youtube_tracker/pkg/youtube"
+    "github.com/joho/godotenv"
+    "log"
+    "os"
+    "youtube_tracker/pkg/youtube"
+    "youtube_tracker/pkg/calendar/gmail"
+    "google.golang.org/api/calendar/v3"
 )
 
-// Defining parser struct
-type Video struct {
-	Items []struct {
-		Snippet struct {
-			Title       string `json:"title"`
-			Description string `json:"description"`
-		} `json:"snippet"`
-	} `json:"items"`
-}
-
-// Parsing video details
-func parseVideoDetails(videoDetails string) (string, string, error) {
-	var video Video
-	err := json.Unmarshal([]byte(videoDetails), &video)
-	if err != nil {
-		return "", "", err
-	}
-
-	if len(video.Items) == 0 {
-		return "", "", fmt.Errorf("no items in video")
-	}
-
-	title := video.Items[0].Snippet.Title
-	description := video.Items[0].Snippet.Description
-
-	return title, description, nil
-}
-
 func main() {
+    err := godotenv.Load("../../.env")
+    if err != nil {
+        log.Fatalf("Error loading .env file. Err: %s", err)
+    }
 
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		log.Fatalf("Error loading .env file. Err: %s", err)
-	}
-	// TODO put inside secrets or somewhere there
-	videoID := "0hBQBhinxeU"
-	apiKey := os.Getenv("API_KEY")
+    videoID := "0hBQBhinxeU"
+    apiKey := os.Getenv("API_KEY")
 
-	videoDetails, err := youtube.FetchVideoDetails(videoID, apiKey)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	title, description, err := parseVideoDetails(videoDetails)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// Limit the description to the first 100 characters
-	if len(description) > 200 {
-		description = description[:200] + "..."
-	}
-
-	fmt.Println("Title:", title)
-	fmt.Println("Description:", description)
-
+    title, description, err := youtube.FetchVideoDetails(videoID, apiKey)
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    // Limit the description to the first 200 characters
+    if len(description) > 200 {
+        description = description[:200] + "..."
+    }
+    event := &calendar.Event{
+        Summary: title,
+        Description: description,
+        // ... (set other fields as needed) ...
+    }
+    err = gmail.CreateEventWithoutCtx(event)
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    log.Println("Event created successfully")
 }
